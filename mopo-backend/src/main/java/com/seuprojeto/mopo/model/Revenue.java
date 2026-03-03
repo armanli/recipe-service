@@ -1,12 +1,19 @@
 package com.seuprojeto.mopo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,141 +22,58 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "revenues")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Revenue {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
 
-  @Column(length = 100, nullable = false)
-  private String title;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-  @Column(length = 300)
-  private String description;
+    @NotBlank(message = "Title is required")
+    @Column(length = 100, nullable = false)
+    private String title;
 
-  @Column
-  @Lob
-  private String image;
+    @Column(length = 300)
+    private String description;
 
-  @Column(nullable = false)
-  @NotEmpty(message = "List cannot be empty")
-  private List<@NotEmpty(message = "Variable cannot be empty") @NotNull(message = "Variable cannot be null") String> ingredients = new ArrayList<>();
+    @Lob
+    private String image;
 
-  @Column(nullable = false)
-  @NotEmpty(message = "List cannot be empty")
-  private List<@NotEmpty(message = "Variable cannot be empty") @NotNull(message = "Variable cannot be null") String> instructions = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "revenue_ingredients", joinColumns = @JoinColumn(name = "revenue_id"))
+    @Column(name = "ingredient")
+    @NotEmpty(message = "Ingredients list cannot be empty")
+    private List<String> ingredients = new ArrayList<>();
 
-  private int preparationTime;
+    @ElementCollection
+    @CollectionTable(name = "revenue_instructions", joinColumns = @JoinColumn(name = "revenue_id"))
+    @Column(name = "instruction")
+    @NotEmpty(message = "Instructions list cannot be empty")
+    private List<String> instructions = new ArrayList<>();
 
-  @Column
-  private int efficiency;
+    @PositiveOrZero(message = "Preparation time must be positive")
+    private int preparationTime;
 
-  @Column
-  private int rating;
+    @PositiveOrZero
+    private int efficiency;
 
-  @Column
-  private int difficulty;
+    @Min(0)
+    @Max(5)
+    private int rating;
 
-  @CreationTimestamp
-  @Column
-  private LocalDateTime createdAt;
+    @Min(1)
+    @Max(3)
+    private int difficulty;
 
-  @UpdateTimestamp
-  @Column
-  private LocalDateTime updatedAt;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-  public Revenue() {
-  }
-
-  public Revenue(
-    String title,
-    String image,
-    List<String> ingredients,
-    List<String> instructions,
-    int preparationTime) {
-    this.title = title;
-    this.image = image;
-    this.ingredients = ingredients;
-    this.instructions = instructions;
-    this.preparationTime = preparationTime;
-  }
-
-  public LocalDateTime getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public int getDifficulty() {
-    return difficulty;
-  }
-
-  public void setDifficulty(int difficulty) {
-    this.difficulty = difficulty;
-  }
-
-  public int getRating() {
-    return rating;
-  }
-
-  public int getEfficiency() {
-    return efficiency;
-  }
-
-  public void setEfficiency(int efficiency) {
-    this.efficiency = efficiency;
-  }
-
-  public int getPreparationTime() {
-    return preparationTime;
-  }
-
-  public void setPreparationTime(int preparationTime) {
-    this.preparationTime = preparationTime;
-  }
-
-  public List<String> getInstructions() {
-    return instructions;
-  }
-
-  public void updateInstructions(List<String> instructions) {
-    BeanUtils.copyProperties(instructions, this.instructions);
-  }
-
-  public List<String> getIngredients() {
-    return ingredients;
-  }
-
-  public void updateIngredients(List<String> ingredients) {
-    BeanUtils.copyProperties(ingredients, this.ingredients);
-  }
-
-  public String getImage() {
-    return image;
-  }
-
-  public void setImage(String image) {
-    this.image = image;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public UUID getId() {
-    return id;
-  }
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
