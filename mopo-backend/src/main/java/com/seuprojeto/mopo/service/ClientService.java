@@ -1,5 +1,6 @@
 package com.seuprojeto.mopo.service;
 
+import com.seuprojeto.mopo.dto.request.ClientRequestDTO;
 import com.seuprojeto.mopo.dto.response.ClientResponseDTO;
 import com.seuprojeto.mopo.model.Client;
 import com.seuprojeto.mopo.repository.IClientRepository;
@@ -14,27 +15,28 @@ import java.util.stream.Collectors;
 @Service
 public class ClientService {
 
-  @Autowired
-  private IClientRepository repository;
+    @Autowired
+    private IClientRepository repository;
 
-  public ClientResponseDTO create(Client client) {
-    var entity = repository.save(client);
-    return new ClientResponseDTO(entity);
-  }
+    public ClientResponseDTO create(ClientRequestDTO dto) {
+        var entity = Client.builder().username(dto.username()).email(dto.email()).password(dto.password()).build();
+        var response = repository.save(entity);
+        return new ClientResponseDTO(response);
+    }
 
-  public List<ClientResponseDTO> readAll() {
-    return repository.findAll().stream().map(ClientResponseDTO::new).collect(Collectors.toList());
-  }
+    public List<ClientResponseDTO> readAll() {
+        return repository.findAll().stream().map(ClientResponseDTO::new).collect(Collectors.toList());
+    }
 
-  public ClientResponseDTO readById(@PathVariable UUID id) throws Exception {
-    var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
-    return new ClientResponseDTO(entity);
-  }
+    public ClientResponseDTO readById(@PathVariable UUID id) throws Exception {
+        var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
+        return new ClientResponseDTO(entity);
+    }
 
-  public ClientResponseDTO deleteById(@PathVariable UUID id) throws Exception {
-    var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
-    repository.deleteById(id);
+    public ClientResponseDTO deleteById(@PathVariable UUID id) throws Exception {
+        var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
+        repository.deleteById(id);
 
-    return new ClientResponseDTO(entity);
-  }
+        return new ClientResponseDTO(entity);
+    }
 }

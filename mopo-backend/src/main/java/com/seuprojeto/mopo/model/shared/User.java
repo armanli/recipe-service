@@ -3,7 +3,10 @@ package com.seuprojeto.mopo.model.shared;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,100 +14,52 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public abstract class User {
-  public User() {
-  }
 
-  public User(String username, String email, String password) {
-    this.username = username;
-    this.email = email;
-    this.password = password;
-  }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+    @NotBlank(message = "Username cannot be blank")
+    @Column(unique = true, length = 100, nullable = false)
+    private String username;
 
-  @NotBlank(message = "Username cannot be blank")
-  @NotNull(message = "Variable cannot be null")
-  @Column(unique = true, length = 100)
-  private String username = "";
+    @Email(message = "Invalid email")
+    @NotBlank(message = "Email cannot be blank")
+    @Column(unique = true, length = 100, nullable = false)
+    private String email;
 
-  @Email(message = "Invalid email")
-  @NotBlank(message = "Email cannot be blank")
-  @NotNull(message = "Variable cannot be null")
-  @Column(nullable = false, unique = true, length = 100)
-  private String email;
+    @NotBlank(message = "Password cannot be blank")
+    @Column(nullable = false)
+    private String password;
 
-  @NotBlank(message = "Password cannot be blank")
-  @NotNull(message = "Variable cannot be null")
-  @Column(nullable = false)
-  private String password;
+    @Size(max = 15, message = "Telephone cannot exceed 15 characters")
+    @Column(length = 15)
+    private String telephone;
 
-  @NotNull(message = "Variable cannot be null")
-  @Column(length = 15)
-  private String telephone = "";
+    @Column(nullable = false)
+    private boolean isActive = true;
 
-  @Column(nullable = false)
-  private boolean isActive = true;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-  @Column
-  @CreationTimestamp
-  private LocalDateTime createdAt;
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-  @Column
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+    protected User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 
-  public UUID getId() {
-    return id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getTelephone() {
-    return telephone;
-  }
-
-  public void setTelephone(String telephone) {
-    this.telephone = telephone;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public LocalDateTime getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public boolean isActive() {
-    return isActive;
-  }
-
-  public void toggleActive() {
-    this.isActive = !this.isActive;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void toggleActive() {
+        this.isActive = !this.isActive;
+    }
 }
