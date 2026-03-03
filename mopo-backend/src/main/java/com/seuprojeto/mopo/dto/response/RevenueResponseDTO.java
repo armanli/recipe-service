@@ -2,7 +2,6 @@ package com.seuprojeto.mopo.dto.response;
 
 import com.seuprojeto.mopo.model.Revenue;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
