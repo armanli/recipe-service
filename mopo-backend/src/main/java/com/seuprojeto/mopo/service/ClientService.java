@@ -1,42 +1,53 @@
 package com.seuprojeto.mopo.service;
 
-import com.seuprojeto.mopo.dto.request.ClientRequestDTO;
+import com.seuprojeto.mopo.dto.request.ClientCreateRequestDTO;
 import com.seuprojeto.mopo.dto.response.ClientResponseDTO;
+import com.seuprojeto.mopo.dto.response.page.PageResponseDTO;
+import com.seuprojeto.mopo.exceptions.ResourceNotFoundException;
 import com.seuprojeto.mopo.model.Client;
 import com.seuprojeto.mopo.repository.IClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.seuprojeto.mopo.service.interfaces.IClientService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
-public class ClientService {
+public class ClientService implements IClientService {
 
-    @Autowired
-    private IClientRepository repository;
+    private final IClientRepository repository;
 
-    public ClientResponseDTO create(ClientRequestDTO dto) {
+    public ClientService(IClientRepository repository) {
+        this.repository = repository;
+    }
+
+    public PageResponseDTO<ClientResponseDTO> findAll(Pageable pageable, String baseUrl) {
+        var pages = repository.findAll(pageable);
+        var pagesMapped = pages.map(ClientResponseDTO::fromEntity);
+
+        return PageResponseDTO.fromPage(pagesMapped, baseUrl);
+    }
+
+    public ClientResponseDTO findById(UUID id) {
+        return repository.findById(id)
+                .map(ClientResponseDTO::fromEntity)
+                .orElseThrow(() -> new ResourceNotFoundException(Client.class.toString(), "id", id));
+    }
+
+    public ClientResponseDTO create(ClientCreateRequestDTO dto) {
+        repository.findByEmail(dto.email()).ifPresent(res -> {
+            throw new IllegalArgumentException(String.format("Client with email %s already exists", dto.email()));
+        });
+
         var entity = Client.builder().username(dto.username()).email(dto.email()).password(dto.password()).build();
         var response = repository.save(entity);
-        return new ClientResponseDTO(response);
+
+        return ClientResponseDTO.fromEntity(response);
     }
 
-    public List<ClientResponseDTO> readAll() {
-        return repository.findAll().stream().map(ClientResponseDTO::new).collect(Collectors.toList());
-    }
-
-    public ClientResponseDTO readById(@PathVariable UUID id) throws Exception {
-        var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
-        return new ClientResponseDTO(entity);
-    }
-
-    public ClientResponseDTO deleteById(@PathVariable UUID id) throws Exception {
-        var entity = repository.findById(id).orElseThrow(() -> new Exception("User not found"));
+    public void deleteById(UUID id) {
+        findById(id);
         repository.deleteById(id);
-
-        return new ClientResponseDTO(entity);
     }
 }
