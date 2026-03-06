@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
-public record ClientRequestDTO(
+public record ClientCreateRequestDTO(
         @NotBlank(message = "The username cannot be empty.")
         String username,
 
