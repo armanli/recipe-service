@@ -43,12 +43,14 @@ public class Revenue {
     @Lob
     private String image;
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "revenue_ingredients", joinColumns = @JoinColumn(name = "revenue_id"))
     @Column(name = "ingredient")
     @NotEmpty(message = "Ingredients list cannot be empty")
     private List<String> ingredients = new ArrayList<>();
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "revenue_instructions", joinColumns = @JoinColumn(name = "revenue_id"))
     @Column(name = "instruction")

@@ -42,6 +42,7 @@ public abstract class User {
     @Column(length = 15)
     private String telephone;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean isActive = true;
 
