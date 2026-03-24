@@ -12,6 +12,8 @@ public interface IRevenueService {
 
     RevenueResponseDTO findById(UUID id);
 
+    RevenueResponseDTO findByTitle(String title);
+
     RevenueResponseDTO create(CreateOrUpdateRevenueRequestDTO request);
 
     RevenueResponseDTO update(UUID id, CreateOrUpdateRevenueRequestDTO request);

@@ -2,6 +2,7 @@ package com.seuprojeto.mopo.dto.response;
 
 import com.seuprojeto.mopo.model.Revenue;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,11 +20,15 @@ public record RevenueResponseDTO(
 ) {
 
     public static RevenueResponseDTO fromEntity(Revenue revenue) {
+        String imageBase64 = null;
+        if (revenue.getImage() != null) {
+            imageBase64 = Base64.getEncoder().encodeToString(revenue.getImage());
+        }
         return new RevenueResponseDTO(
                 revenue.getId(),
                 revenue.getTitle(),
                 revenue.getDescription(),
-                revenue.getImage(),
+                imageBase64,
                 revenue.getIngredients(),
                 revenue.getInstructions(),
                 revenue.getPreparationTime(),
