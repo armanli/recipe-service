@@ -41,7 +41,8 @@ public class Revenue {
     private String description;
 
     @Lob
-    private String image;
+    @Column(columnDefinition = "bytea")
+    private byte[] image;
 
     @Builder.Default
     @ElementCollection
