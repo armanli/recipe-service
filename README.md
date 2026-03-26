@@ -10,7 +10,7 @@ O objetivo é fornecer uma base escalável, organizada e pronta para evolução,
 ### 🏛️ Arquitetura 
 O sistema segue uma arquitetura de **Microsserviços**:
 
-**Revenue Service** Responsável pelas receitas. Funcionalidades:
+**Recipes Service** Responsável pelas receitas. Funcionalidades:
 - Cadastro de receitas
 - Ingredientes e instruções
 - Avaliação e dificuldade
